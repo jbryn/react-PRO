@@ -1,4 +1,4 @@
-import React, { useState, useReducer } from "react";
+import React, { useState, useReducer, useEffect } from "react";
 import Header from "../shared/Header";
 import Table from "../shared/Table";
 import usersInitial from "../../data/usersInitial";
@@ -10,6 +10,18 @@ export default function Main() {
   const [users, dispatch] = useReducer(usersReducer, usersInitial);
   const [selectedUser, setSelectedUser] = useState({});
   const [orderBy, setOrderBy] = useState(() => {});
+
+  useEffect(() => {
+    const users = JSON.parse(localStorage.getItem("users"));
+
+    if (users) {
+      dispatch({ type: "POPULATE", users });
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("users", JSON.stringify(users));
+  }, [users]);
 
   return (
     <>
