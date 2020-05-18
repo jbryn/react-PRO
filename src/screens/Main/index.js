@@ -4,26 +4,7 @@ import Table from "../shared/Table";
 import usersInitial from "../../data/usersInitial";
 import UsersContext from "../../context/users-context";
 import AddUserForm from "../shared/AddUserForm/index";
-
-const usersReducer = (state, action) => {
-  switch (action.type) {
-    case "POPULATE":
-      return action.users;
-    case "ADD":
-      return [
-        ...state,
-        {
-          idUser: state.length > 0 ? state[state.length - 1].idUser + 1 : 1,
-          firstName: action.firstName,
-          lastName: action.lastName,
-        },
-      ];
-    case "REMOVE":
-      return state.filter((user) => user.idUser !== action.idUser);
-    default:
-      return state;
-  }
-};
+import usersReducer from "../../reducers/users-reducer";
 
 export default function Main() {
   const [users, dispatch] = useReducer(usersReducer, usersInitial);
