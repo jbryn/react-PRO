@@ -1,48 +1,55 @@
-import React, { useState } from "react";
+import React, { useState, useReducer } from "react";
 import Header from "../shared/Header";
 import Table from "../shared/Table";
+import usersInitial from "../../data/usersInitial";
+import UsersContext from "../../context/users-context";
+import AddUserForm from "../shared/AddUserForm/index";
+
+const usersReducer = (state, action) => {
+  switch (action.type) {
+    case "POPULATE":
+      return action.users;
+    case "ADD":
+      return [
+        ...state,
+        {
+          idUser: state.length > 0 ? state[state.length - 1].idUser + 1 : 1,
+          firstName: action.firstName,
+          lastName: action.lastName,
+        },
+      ];
+    case "REMOVE":
+      return state.filter((user) => user.idUser !== action.idUser);
+    default:
+      return state;
+  }
+};
 
 export default function Main() {
-  const usersInitial = [
-    { idUser: 1, firstName: "Jan", lastName: "Kowalski" },
-    { idUser: 2, firstName: "Andrzej", lastName: "Malewicz" },
-    { idUser: 3, firstName: "Anna", lastName: "Andrzejewicz" },
-    { idUser: 4, firstName: "Marcin", lastName: "Kwiatkowski" },
-    { idUser: 5, firstName: "Michał", lastName: "Kowalski" },
-  ];
-
-  const [users, setUsers] = useState(usersInitial);
+  const [users, dispatch] = useReducer(usersReducer, usersInitial);
   const [selectedUser, setSelectedUser] = useState({});
-
-  const addUser = (e) => {
-    setUsers([
-      ...users,
-      {
-        idUser: users[users.length - 1].idUser + 1,
-        firstName: "AAA",
-        lastName: "BBB",
-      },
-    ]);
-  };
-
-  const setCurrentlySelectedUser = (user) => {
-    setSelectedUser(user);
-  };
+  const [orderBy, setOrderBy] = useState(() => {});
 
   return (
     <>
-      <Header />
-      <div className="container">
-        <br />
-        <button type="button" onClick={addUser} className="btn">
-          Dodaj użytkownika
-        </button>
-        <Table
-          users={users}
-          setSelectedUser={setCurrentlySelectedUser}
-          selectedUser={selectedUser}
-        />
-      </div>
+      <UsersContext.Provider
+        value={{
+          users,
+          dispatch,
+          selectedUser,
+          setSelectedUser,
+          orderBy,
+          setOrderBy,
+        }}
+      >
+        <Header />
+        <div className="container">
+          <br />
+
+          <AddUserForm />
+          <Table />
+        </div>
+      </UsersContext.Provider>
     </>
   );
 }
